@@ -1,0 +1,31 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: postgres_db
+    environment:
+      POSTGRES_DB: ${DB_NAME:-blog_db}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: "${DB_PASSWORD:?Set DB_PASSWORD in .env}"
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/init/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  app:
+    build: .
+    container_name: scala_blog_app
+    ports:
+      - "${API_PORT:-8080}:8080"
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-blog_db}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: "${DB_PASSWORD:?Set DB_PASSWORD in .env}"
+      JWT_SECRET: "${JWT_SECRET:?Set JWT_SECRET in .env}"
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:

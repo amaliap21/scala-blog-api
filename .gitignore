@@ -1,0 +1,6 @@
+.env
+target/
+.bsp/
+.metals/
+.idea/
+*.log
